@@ -4,6 +4,10 @@ const map_num_cols = 15;
 
 const window_width = map_num_cols * TILE_SIZE;
 const window_height = map_num_rows * TILE_SIZE;
+const fov_angle = 60 * (Math.PI / 180);
+const wall_trip_width = 90;
+const num_rays = window_width / wall_trip_width;
+
 class Map {
     constructor () {
         this.grid = [
@@ -20,12 +24,14 @@ class Map {
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         ]
     }
-    hasWallAt(x, y) {
-        if (x < 0 || x > window_width || y < 0 || window_height < y)
+    hasWallAt(x, y) 
+    {
+        if (x <= 0 || x >= window_width || y <= 0 || window_height <= y)
             return true;
         var mapGridIndexX = Math.floor(x / TILE_SIZE);
         var mapGridIndexY = Math.floor(y / TILE_SIZE);
-        if (this.grid[mapGridIndexX,mapGridIndexY] != 0)
+        console.log(this.grid[mapGridIndexY][mapGridIndexX])
+        if (this.grid[mapGridIndexY][mapGridIndexX] == 1)
             return (true)
         return (false);
         
@@ -87,6 +93,21 @@ class Player {
 
 var player = new Player();
 
+
+class Ray {
+    constructor(rayAngle) {
+        // TODO:
+        this.rayAngle = rayAngle;
+    }
+    render() {
+        // TODO:
+        //stroke("red");
+        line(player.x,player.y, player.x + Math.cos(this.rayAngle)*30, player.y + Math.sin(this.rayAngle)*30);
+    }
+}
+
+var rays = [];
+
 function keyPressed() { // Defined on p5.js
     if(keyCode == UP_ARROW) {
         player.walkDirection = +1;
@@ -116,6 +137,19 @@ function keyReleased() {
         player.turnDirection = 0;
     }
 }
+function castAllRays() {
+    var columnId = 0;
+    //start first ray substracing half of the view
+    var rayAngle = player.rotationAngle - (fov_angle / 2);
+    //var rays = [];
+    for (var i = 0; i < num_rays; i++) {
+        var ray = new Ray(rayAngle);
+        rays.push(ray);
+        rayAngle += fov_angle/num_rays;
+        columnId++;
+    }
+}
+
 function setup() {
     // TODO: initialize all objects
     createCanvas(window_width, window_height);
@@ -124,6 +158,7 @@ function setup() {
 function update() {
     // TODO: update all game objects before we render the next frame
     player.update();
+    castAllRays();
 }
 
 function draw() { // Defined on p5.js
@@ -131,4 +166,7 @@ function draw() { // Defined on p5.js
     update();
     grid.render();
     player.render();
+    for(ray of rays) {
+        ray.render();
+    }
 }
