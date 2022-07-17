@@ -5,7 +5,7 @@ const map_num_cols = 15;
 const window_width = map_num_cols * TILE_SIZE;
 const window_height = map_num_rows * TILE_SIZE;
 const fov_angle = 60 * (Math.PI / 180);
-const wall_trip_width = 90;
+const wall_trip_width = 44;
 const num_rays = window_width / wall_trip_width;
 
 class Map {
@@ -101,7 +101,7 @@ class Ray {
     }
     render() {
         // TODO:
-        //stroke("red");
+        stroke("red");
         line(player.x,player.y, player.x + Math.cos(this.rayAngle)*30, player.y + Math.sin(this.rayAngle)*30);
     }
 }
@@ -141,7 +141,7 @@ function castAllRays() {
     var columnId = 0;
     //start first ray substracing half of the view
     var rayAngle = player.rotationAngle - (fov_angle / 2);
-    //var rays = [];
+    rays = [];
     for (var i = 0; i < num_rays; i++) {
         var ray = new Ray(rayAngle);
         rays.push(ray);
