@@ -5,7 +5,11 @@ const map_num_cols = 15;
 const window_width = map_num_cols * TILE_SIZE;
 const window_height = map_num_rows * TILE_SIZE;
 const fov_angle = 60 * (Math.PI / 180);
+<<<<<<< HEAD
 const wall_trip_width = 44;
+=======
+const wall_trip_width = 40;
+>>>>>>> b3e97f15df086ff7abe04402317dc0e402f47392
 const num_rays = window_width / wall_trip_width;
 
 class Map {
@@ -93,16 +97,47 @@ class Player {
 
 var player = new Player();
 
+function normalize(angle) {
+    angle = angle % (2 * Math.PI)
+    if (angle < 0) {
+        angle = (2 * Math.PI) + angle;
+    }
+    return (angle);
+}
 
 class Ray {
     constructor(rayAngle) {
         // TODO:
-        this.rayAngle = rayAngle;
+        this.rayAngle = normalize(rayAngle);
+        this.wallHitX = 0;
+        this.wallHitY = 0;
+        this.distance = 0;
+
+        this.isRayFacingDown = this.rayAngle > 0 && this.rayAngle < Math.PI;
+        this.isRayFacingup = !this.isRayFacingDown;
+        this.isRayFacingright = this.rayAngle < 0.5 * Math.PI || this.rayAngle > 1.5 * Math.PI;
+        this.isRayFacingleft = !this.isRayFacingright;
     }
     render() {
         // TODO:
         stroke("red");
         line(player.x,player.y, player.x + Math.cos(this.rayAngle)*30, player.y + Math.sin(this.rayAngle)*30);
+    }
+    cast(columnId) {
+        var xintercep, yintercep;
+        var xstep, ystep;
+        
+        ///////////////////////////////////////////////////////////////
+        // HORIZONTAL RAY-GRID INTERSECTION CODE//////////////////////
+        //////////////////////////////////////////////////////////////
+        /// TODO:...
+
+        // FIND THE Y-CORDINATE AND X-CORDINATE OF THE CLOSEST GRID INTERSACTION
+        yintercep = Math.floor(player.y / TILE_SIZE) * TILE_SIZE;
+        xintercep = player.x + (player.y - yintercep) / Math.tan(this.rayAngle);
+
+
+
     }
 }
 
@@ -144,6 +179,7 @@ function castAllRays() {
     rays = [];
     for (var i = 0; i < num_rays; i++) {
         var ray = new Ray(rayAngle);
+        ray.cast();
         rays.push(ray);
         rayAngle += fov_angle/num_rays;
         columnId++;
